@@ -28,7 +28,7 @@ void Hash_compressDoubleSha256(uint8_t output[static 32], uint8_t* buff, uint32_
 
 void Hash_expand(
     uint8_t* restrict buff, uint32_t len,
-    const uint8_t* restrict seed,
+    const uint8_t seed[static 32],
     uint32_t num
 ) {
     uint32_t nonce[3] = { num };

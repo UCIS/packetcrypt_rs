@@ -44,9 +44,6 @@ struct AnnClassMut {
 pub struct AnnClass {
     m: RwLock<AnnClassMut>,
 
-    /// The hash of the current block.
-    block_hash: Hash,
-
     // The type of anns in this class.
     block_height: u32,
     min_ann_work: u32,
@@ -81,7 +78,6 @@ impl AnnClass {
                 topbuf,
                 dependent_trees: vec![],
             }),
-            block_hash: Default::default(),
             block_height: hw.block_height as u32,
             min_ann_work: hw.work,
             id,
