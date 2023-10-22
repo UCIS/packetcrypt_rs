@@ -18,6 +18,7 @@
 #include "Conf.h"
 #include "Util.h"
 #include "packetcrypt/Validate.h"
+#include "ValidateCtx.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -143,8 +144,30 @@ static void populateTable(CryptoCycle_Item_t* table, Buf64_t* annHash0) {
     }
 }
 
+ __attribute__((unused))
+static int populateTableJIT(Worker_t* w, Buf64_t* seed) {
+  if (Announce_createProg(w->vctx, &seed->thirtytwos[0])) {
+    return -1;
+  }
+
+  rh_jit_program_t* program = rh_generate_program(w->vctx->progbuf, w->vctx->progLen);
+
+  for (int i = 0; i < Announce_TABLE_SZ; i++) {
+    // Allow this to be interrupted in case we should stop
+    if (getRequestedState(w) != ThreadState_RUNNING) { return -1; }
+    rh_make_item(i, &w->job.table[i], w->vctx, &seed->thirtytwos[1], program);
+  }
+     
+  rh_free_program(program);
+
+  return 0;
+}
+
 // -1 means try again
 static int populateTable2(Worker_t* w, Buf64_t* seed) {
+    #ifdef JIT_ENABLED
+    return populateTableJIT(w, seed);
+    #endif
     if (Announce_createProg(w->vctx, &seed->thirtytwos[0])) {
         return -1;
     }
