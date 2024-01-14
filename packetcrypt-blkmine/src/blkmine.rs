@@ -105,7 +105,7 @@ fn get_current_mining(bm: &BlkMine) -> Option<CurrentMining> {
     let mut cm_l = bm.current_mining.lock().unwrap();
     let cm_o: &mut Option<CurrentMining> = &mut *cm_l;
     let out = cm_o.clone();
-    if let Some(mut cm) = cm_o.as_mut() {
+    if let Some(cm) = cm_o.as_mut() {
         cm.shares = 0;
     }
     out
