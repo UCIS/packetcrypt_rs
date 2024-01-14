@@ -13,7 +13,6 @@
 
 // floor(log2(x))
 static inline int Util_log2floor(uint64_t x) {
-    assert(x);
     return 63 - _Generic(x,
         unsigned long long: __builtin_clzll(x),
         unsigned long: __builtin_clzl(x)

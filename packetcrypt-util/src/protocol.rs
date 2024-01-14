@@ -2,7 +2,8 @@
 use anyhow::{bail, Result};
 use bytes::{Buf, BufMut, Bytes, BytesMut};
 use serde::{Deserialize, Serialize};
-use serde_hex::{SerHex, SerHexOpt, SerHexSeq, Strict};
+use serde_hex::{SerHexSeq, Strict};
+use crate::safeserhex;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(rename_all = "camelCase")]
@@ -83,13 +84,12 @@ pub struct AnnPostReply {
 #[derive(Deserialize, Debug, Clone, Default, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct MasterConf {
-    #[serde(with = "SerHexOpt::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_opt_32")]
     pub tip_hash: Option<[u8; 32]>,
 
     pub current_height: i32,
     pub master_url: String,
     pub submit_ann_urls: Vec<String>,
-    pub download_ann_urls: Vec<String>,
     pub submit_block_urls: Vec<String>,
     pub paymaker_url: String,
     pub version: u32,
@@ -121,23 +121,23 @@ pub struct Work {
     pub coinbase_merkle: Vec<Bytes>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, Copy)]
+#[derive(Deserialize, Debug, Clone, Default, Copy)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockInfoHeader {
-    #[serde(with = "SerHex::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_32")]
     pub hash: [u8; 32],
     pub height: i32,
     pub version: u32,
-    #[serde(with = "SerHex::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_4")]
     pub version_hex: [u8; 4],
-    #[serde(with = "SerHex::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_32")]
     pub merkleroot: [u8; 32],
     pub time: u32,
     pub nonce: u32,
-    #[serde(with = "SerHex::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_4")]
     pub bits: [u8; 4],
     pub difficulty: f64,
-    #[serde(with = "SerHex::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_32")]
     pub previousblockhash: [u8; 32],
 }
 
@@ -148,11 +148,11 @@ pub struct AnnIndex {
     pub files: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, Copy)]
+#[derive(Deserialize, Debug, Clone, Default, Copy)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockInfo {
     pub header: BlockInfoHeader,
-    #[serde(with = "SerHexOpt::<Strict>")]
+    #[serde(deserialize_with = "safeserhex::from_hex_opt_32")]
     pub sig_key: Option<[u8; 32]>,
 }
 
@@ -215,7 +215,7 @@ pub fn put_varint(num: u64, b: &mut BytesMut) {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct BlkShare {
     #[serde(with = "SerHexSeq::<Strict>")]
     pub coinbase_commit: Bytes,

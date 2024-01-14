@@ -11,3 +11,4 @@ pub mod hash;
 pub mod poolclient;
 pub mod protocol;
 pub mod util;
+pub mod safeserhex;
