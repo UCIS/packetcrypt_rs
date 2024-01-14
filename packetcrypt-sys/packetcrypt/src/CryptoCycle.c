@@ -217,13 +217,14 @@ void CryptoCycle_blockMineMulti(
 
 void CryptoCycle_annMineMulti(
     CryptoCycle_State_t* pcStates,
-    const Buf32_t* hdrHash,
+    const CryptoCycle_State_t* state0,
     uint32_t nonceBase,
     const CryptoCycle_Item_t* table,
     int* itemNos
 ) {
     for (int k = 0; k < CryptoCycle_PAR_STATES; k++) {
-        init(&pcStates[k], hdrHash, nonceBase + k);
+        pcStates[k] = *state0;
+        pcStates[k].ints[0] = nonceBase + k;
     }
     for (int i = 0; i < 4; i++) {
         const CryptoCycle_Item_t* it[CryptoCycle_PAR_STATES];

@@ -187,11 +187,13 @@ __attribute__((always_inline))
 static inline void searchOpt(Worker_t* restrict w) {
     int nonce = w->softNonce;
     uint32_t target = w->job.hah.annHdr.workBits;
+    CryptoCycle_State_t state0;
+    CryptoCycle_init(&state0, &w->job.annHash1.thirtytwos[0], nonce);
     for (int i = 0; i < HASHES_PER_CYCLE; i += CryptoCycle_PAR_STATES) {
         int itemNos[CryptoCycle_PAR_STATES] = {0};
         CryptoCycle_annMineMulti(
             w->states,
-            &w->job.annHash1.thirtytwos[0],
+            &state0,
             nonce,
             w->job.table,
             itemNos

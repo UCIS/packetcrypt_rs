@@ -238,7 +238,7 @@ void CryptoCycle_blockMineMulti(
 
 void CryptoCycle_annMineMulti(
     CryptoCycle_State_t* pcStates,
-    const Buf32_t* hdrHash,
+    const CryptoCycle_State_t* state0,
     uint32_t nonceBase,
     const CryptoCycle_Item_t* table,
     int* itemNos
