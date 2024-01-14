@@ -268,10 +268,11 @@ fn update_work_cycle(am: &AnnMine, p: &Arc<Pool>, update: PoolUpdate) -> Vec<Arc
     };
 
     info!(
-        "Start mining with parent_block_height: [{} @ {}] old: [{}]",
+        "Start mining with parent_block_height: [{} @ {}] old: [{}] diff: [{}]",
         hex::encode(job.header.hash),
         job.header.height,
-        mine_old
+        mine_old,
+        packetcrypt_sys::difficulty::tar_to_diff(ann_target),
     );
     // Reverse the parent block hash because hashes in bitcoin are always expressed backward
     let mut rev_hash = job.header.hash;
