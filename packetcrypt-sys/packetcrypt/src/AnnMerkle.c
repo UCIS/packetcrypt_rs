@@ -10,6 +10,7 @@
 #include "AnnMerkle.h"
 
 #include "sodium/crypto_verify_64.h"
+#include "sodium/randombytes.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -35,7 +36,11 @@ void AnnMerkle__build(int depth, uint8_t* out, uint8_t* table, int itemSz)
 {
     int odx = 0;
     for (int i = 0; i < (1<<depth); i++) {
-        Hash_compress64(&out[odx * 64], &table[odx * itemSz], itemSz);
+        uint8_t *item = &table[odx * itemSz];
+        if( i == 0 ) { //if leaf-nonce override with random value
+            randombytes_buf(item, 1024);
+        }
+        Hash_compress64(&out[odx * 64], item, itemSz);
         odx++;
     }
     int idx = 0;

@@ -106,7 +106,7 @@ enum ThreadState {
 
 struct Worker_s {
     CryptoCycle_State_t pcState;
-    CryptoCycle_State_t pcStates[CryptoCycle_PAR_STATES];
+     CryptoCycle_State_t pcStates[4/*CryptoCycle_PAR_STATES*/];
 
     Global_t* g;
     pthread_t thread;
@@ -127,66 +127,66 @@ struct Worker_s {
 // Worker
 static void mineOpt(Worker_t* w)
 {
-    Time t;
-    Time_BEGIN(t);
+    // Time t;
+    // Time_BEGIN(t);
 
-    PacketCrypt_BlockHeader_t hdr;
-    Buf_OBJCPY(&hdr, &w->g->hai.header);
-    hdr.nonce = w->nonceId;
+    // PacketCrypt_BlockHeader_t hdr;
+    // Buf_OBJCPY(&hdr, &w->g->hai.header);
+    // hdr.nonce = w->nonceId;
 
-    uint32_t lowNonce = w->lowNonce;
+    // uint32_t lowNonce = w->lowNonce;
 
-    Buf32_t hdrHash;
-    Hash_COMPRESS32_OBJ(&hdrHash, &hdr);
+    // Buf32_t hdrHash;
+    // Hash_COMPRESS32_OBJ(&hdrHash, &hdr);
 
-    for (;;) {
-        for (uint32_t i = 0; i < HASHES_PER_CYCLE; i += CryptoCycle_PAR_STATES) {
-            BlockMine_Res_t res[CryptoCycle_PAR_STATES];
-            CryptoCycle_blockMineMulti(
-                w->pcStates,
-                &hdrHash,
-                lowNonce,
-                w->g->annCount,
-                w->g->hai.index,
-                (const CryptoCycle_Item_t *) w->g->anns,
-                res
-            );
-            for (int j = 0; j < CryptoCycle_PAR_STATES; j++) {
-                if (!Work_check(w->pcStates[j].bytes, w->g->effectiveTarget)) { continue; }
+    // for (;;) {
+    //     for (uint32_t i = 0; i < HASHES_PER_CYCLE; i += 4 /*CryptoCycle_PAR_STATES*/) {
+    //         BlockMine_Res_t res[4/*CryptoCycle_PAR_STATES*/];
+    //         CryptoCycle_blockMineMulti(
+    //             w->pcStates,
+    //             &hdrHash,
+    //             lowNonce,
+    //             w->g->annCount,
+    //             w->g->hai.index,
+    //             (const CryptoCycle_Item_t *) w->g->anns,
+    //             res
+    //         );
+    //         for (int j = 0; j < 4 /*CryptoCycle_PAR_STATES*/; j++) {
+    //             if (!Work_check(w->pcStates[j].bytes, w->g->effectiveTarget)) { continue; }
 
-                if (NOISY_LOG_SHARES) {
-                    printf("share / %u / %u\n", hdr.nonce, lowNonce + j);
-                    printf("effective target %x\n", w->g->effectiveTarget);
-                    for (int k = 0; k < 80; k++) { printf("%02x", ((uint8_t*)&hdr)[k]); }
-                    printf("\n");
-                    for (int k = 0; k < 32; k++) { printf("%02x", hdrHash.bytes[k]); }
-                    printf("\n");
-                    for (int k = 0; k < 4; k++) {
-                        uint64_t loc = res[j].ann_mlocs[k];
-                        uint64_t lloc = res[j].ann_llocs[k];
-                        printf("%llu - ", (long long unsigned) lloc);
-                        for (int kk = 0; kk < 32; kk++) { printf("%02x", ((uint8_t*)&w->g->anns[loc])[kk]); }
-                        printf("\n");
-                    }
-                }
+    //             if (NOISY_LOG_SHARES) {
+    //                 printf("share / %u / %u\n", hdr.nonce, lowNonce + j);
+    //                 printf("effective target %x\n", w->g->effectiveTarget);
+    //                 for (int k = 0; k < 80; k++) { printf("%02x", ((uint8_t*)&hdr)[k]); }
+    //                 printf("\n");
+    //                 for (int k = 0; k < 32; k++) { printf("%02x", hdrHash.bytes[k]); }
+    //                 printf("\n");
+    //                 for (int k = 0; k < 4; k++) {
+    //                     uint64_t loc = res[j].ann_mlocs[k];
+    //                     uint64_t lloc = res[j].ann_llocs[k];
+    //                     printf("%llu - ", (long long unsigned) lloc);
+    //                     for (int kk = 0; kk < 32; kk++) { printf("%02x", ((uint8_t*)&w->g->anns[loc])[kk]); }
+    //                     printf("\n");
+    //                 }
+    //             }
 
-                res[j].low_nonce = lowNonce + j;
-                res[j].high_nonce = hdr.nonce;
-                //Buf_OBJCPY(&res.hdr, &hdr);
-                if (w->g->cb) {
-                    w->g->cb(&res[j], w->g->cbc);
-                }
-            }
-            lowNonce += CryptoCycle_PAR_STATES;
-        }
-        Time_END(t);
-        w->hashesPerSecond = ((HASHES_PER_CYCLE * 1024) / (Time_MICROS(t) / 1024));
-        Time_NEXT(t);
-        if (w->reqState != ThreadState_RUNNING) {
-            w->lowNonce = lowNonce;
-            return;
-        }
-    }
+    //             res[j].low_nonce = lowNonce + j;
+    //             res[j].high_nonce = hdr.nonce;
+    //             //Buf_OBJCPY(&res.hdr, &hdr);
+    //             if (w->g->cb) {
+    //                 w->g->cb(&res[j], w->g->cbc);
+    //             }
+    //         }
+    //         lowNonce += 4; // CryptoCycle_PAR_STATES;
+    //     }
+    //     Time_END(t);
+    //     w->hashesPerSecond = ((HASHES_PER_CYCLE * 1024) / (Time_MICROS(t) / 1024));
+    //     Time_NEXT(t);
+    //     if (w->reqState != ThreadState_RUNNING) {
+    //         w->lowNonce = lowNonce;
+    //         return;
+    //     }
+    // }
 }
 
 // Worker
