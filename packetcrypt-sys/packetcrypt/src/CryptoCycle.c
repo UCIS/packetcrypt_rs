@@ -70,7 +70,7 @@ void CryptoCycle_crypt(CryptoCycle_Header_t* restrict msg)
     }
 
     crypto_stream_chacha20_ietf_xor_ic(
-        msgContent, msgContent, msgLen, msg->nonce, 1U, msg->key_high_or_auth);
+        msgContent, msgContent, msgLen, msg->nonce, 1u, msg->key_high_or_auth);
 
     if (!decrypt) {
         if (tzc) { memset(&msgContent[msgLen-tzc], 0, tzc); }

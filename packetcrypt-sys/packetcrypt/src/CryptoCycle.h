@@ -187,8 +187,6 @@ CryptoCycle_SETTER_GETTER(25, 7, setVersion, getVersion)
 
 void CryptoCycle_makeFuzzable(CryptoCycle_Header_t* restrict hdr);
 
-void CryptoCycle_crypt(CryptoCycle_Header_t* restrict msg);
-
 typedef union {
     CryptoCycle_Header_t hdr;
     Buf_TYPES(2048);
@@ -205,6 +203,8 @@ typedef union {
     Buf64_t sixtyfours[16];
 } CryptoCycle_Item_t;
 _Static_assert(sizeof(CryptoCycle_Item_t) == 1024, "");
+
+void CryptoCycle_crypt(CryptoCycle_Header_t* restrict msg);
 
 static inline uint64_t CryptoCycle_getItemNo(CryptoCycle_State_t* state) {
     return state->sixteens[1].longs[0];
